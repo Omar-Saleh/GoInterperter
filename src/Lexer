@@ -1,0 +1,104 @@
+import java.lang.System;
+import java.io.*;
+import java.util.*;
+
+class Lexer {
+
+	Yylex tokenizer;
+	public  Lexer(String fileName) 
+	{
+	  try
+	  {
+	  tokenizer=new Yylex(new BufferedReader(new FileReader(fileName)));
+	  }
+	  catch(Exception e)
+	  {
+	  
+	  }	 
+	}
+	public Token nextToken()
+	{
+		Token next=null;
+		try
+		{
+		 next=  tokenizer.getToken();
+		}
+		catch(Exception e)
+		{
+		}
+		return next;
+	}
+	}
+
+
+%%
+
+
+%function getToken
+%type Token
+%char
+%line
+%state VARDEC
+
+
+%{
+	//initialize  variables to be used by class
+%}
+
+
+%init{
+
+//Add code to be executed on initialization of the lexer
+	int openParen = 0;
+	int closeParen = 0;
+	int openBraces = 0;
+	int closeBraces = 0;
+	int line = 0;
+	
+
+%init}
+
+UNICODE_LETTER=[A-Za-z]
+UNICODE_DIGIT=[0-9]
+UNICODE_CHAR=(.)
+LETTER=({UNICODE_LETTER}|_)
+UNICODE_VALUE=({UNICODE_CHAR}|{ESC_CHAR})
+ESC_CHAR=\\(a|b|f|n|r|t|v|\\|'|\")
+RAW_STRING = '({UNICODE_CHAR}|{NEWLINE})*'
+INTERP_STRING = \"{UNICODE_VALUE}*\"
+STRING_LIT={RAW_STRING}|{INTERP_STRING}
+IDENTIFIER=({LETTER}({LETTER}|{UNICODE_DIGIT})*)
+NEWLINE = [\ \n]
+INT_LIT = ([1-9]{UNICODE_DIGIT}*)|0
+ADD_OP=\+|-|\|
+MUL_OP=\*|/|%|>>|<<|&
+REL_OP===|!=|<|<=|>|>=
+UNARY_OP=\+|-|!|\*|&|<-
+BINARY_OP = ({ADD_OP}|{MUL_OP}|{REL_OP}|{UNARY_OP})
+PACKAGE_CLAUSE=package{PACKAGE_NAME}
+PACKAGE_NAME={IDENTIFIER}
+
+
+
+%eofval{
+//Add code to be executed when the end of the file is reached
+	return (new Token(Token.EOF, yytext()));
+%eofval}
+
+
+%% 
+<YYINITIAL> {IDENTIFIER} {
+ //	if(yytext().equals("package")) {
+ 	//	return (new Token(Token.PACKAGE,yytext()));
+ 	//}
+ //	else {
+ 	return (new Token(Token.IDENTIFIER,yytext()));
+// 	}
+ }
+<YYINITIAL> {NEWLINE} {}
+<YYINITIAL> {INT_LIT} { return (new Token(Token.INT_LIT,yytext())); }
+<YYINITIAL> {STRING_LIT} { return (new Token(Token.STRING_LIT,yytext())); }
+<YYINITIAL> {PACKAGE_CLAUSE} { return (new Token(Token.PACKAGE,yytext())); }
+<YYINITIAL> . {
+  return new Token(Token.ERROR, "Invalid input: " + yytext());
+}

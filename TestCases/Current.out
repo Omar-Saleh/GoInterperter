@@ -1,0 +1,52 @@
+PACKAGE : package
+IDENTIFIER : main
+IDENTIFIER : import
+STRING_LIT : "fmt"
+IDENTIFIER : import
+STRING_LIT : "math"
+IDENTIFIER : const
+IDENTIFIER : s
+IDENTIFIER : string
+ERROR: Invalid input: =
+STRING_LIT : "constant"
+IDENTIFIER : func
+IDENTIFIER : main
+ERROR: Invalid input: (
+ERROR: Invalid input: )
+ERROR: Invalid input: {
+IDENTIFIER : fmt
+ERROR: Invalid input: .
+IDENTIFIER : Println
+ERROR: Invalid input: (
+IDENTIFIER : s
+ERROR: Invalid input: )
+IDENTIFIER : const
+IDENTIFIER : n
+ERROR: Invalid input: =
+INT_LIT : 500000000
+IDENTIFIER : var
+IDENTIFIER : d
+ERROR: Invalid input: =
+INT_LIT : 3
+IDENTIFIER : e20
+ERROR: Invalid input: /
+IDENTIFIER : n
+IDENTIFIER : fmt
+ERROR: Invalid input: .
+IDENTIFIER : Println
+ERROR: Invalid input: (
+IDENTIFIER : d
+ERROR: Invalid input: )
+IDENTIFIER : fmt
+ERROR: Invalid input: .
+IDENTIFIER : Println
+ERROR: Invalid input: (
+IDENTIFIER : math
+ERROR: Invalid input: .
+IDENTIFIER : Sin
+ERROR: Invalid input: (
+IDENTIFIER : n
+ERROR: Invalid input: )
+ERROR: Invalid input: )
+ERROR: Invalid input: }
+EOF: 
