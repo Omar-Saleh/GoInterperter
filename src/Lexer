@@ -4,31 +4,31 @@ import java.util.*;
 
 class Lexer {
 
-	Yylex tokenizer;
-	public  Lexer(String fileName) 
-	{
-	  try
-	  {
-	  tokenizer=new Yylex(new BufferedReader(new FileReader(fileName)));
-	  }
-	  catch(Exception e)
-	  {
-	  
-	  }	 
-	}
-	public Token nextToken()
-	{
-		Token next=null;
-		try
-		{
-		 next=  tokenizer.getToken();
-		}
-		catch(Exception e)
-		{
-		}
-		return next;
-	}
-	}
+ Yylex tokenizer;
+ public  Lexer(String fileName) 
+ {
+   try
+   {
+   tokenizer=new Yylex(new BufferedReader(new FileReader(fileName)));
+   }
+   catch(Exception e)
+   {
+   
+   }  
+ }
+ public Token nextToken()
+ {
+  Token next=null;
+  try
+  {
+   next=  tokenizer.getToken();
+  }
+  catch(Exception e)
+  {
+  }
+  return next;
+ }
+ }
 
 
 %%
@@ -38,23 +38,17 @@ class Lexer {
 %type Token
 %char
 %line
-%state VARDEC
-
-
+%state PACKAGE, IMPORT
 %{
-	//initialize  variables to be used by class
+ //initialize  variables to be used by class
+ int import_open_paran = 0;
 %}
 
 
 %init{
 
 //Add code to be executed on initialization of the lexer
-	int openParen = 0;
-	int closeParen = 0;
-	int openBraces = 0;
-	int closeBraces = 0;
-	int line = 0;
-	
+
 
 %init}
 
@@ -62,43 +56,62 @@ UNICODE_LETTER=[A-Za-z]
 UNICODE_DIGIT=[0-9]
 UNICODE_CHAR=(.)
 LETTER=({UNICODE_LETTER}|_)
+IDENTIFIER=({LETTER}({LETTER}|{UNICODE_DIGIT})*)
 UNICODE_VALUE=({UNICODE_CHAR}|{ESC_CHAR})
 ESC_CHAR=\\(a|b|f|n|r|t|v|\\|'|\")
 RAW_STRING = '({UNICODE_CHAR}|{NEWLINE})*'
 INTERP_STRING = \"{UNICODE_VALUE}*\"
 STRING_LIT={RAW_STRING}|{INTERP_STRING}
-IDENTIFIER=({LETTER}({LETTER}|{UNICODE_DIGIT})*)
-NEWLINE = [\ \n]
+NEWLINE = [\n]
+SPACE=[\ ]
+TAB=[\t]
 INT_LIT = ([1-9]{UNICODE_DIGIT}*)|0
 ADD_OP=\+|-|\|
 MUL_OP=\*|/|%|>>|<<|&
 REL_OP===|!=|<|<=|>|>=
 UNARY_OP=\+|-|!|\*|&|<-
 BINARY_OP = ({ADD_OP}|{MUL_OP}|{REL_OP}|{UNARY_OP})
-PACKAGE_CLAUSE=package{PACKAGE_NAME}
+PACKAGE_CLAUSE=package
 PACKAGE_NAME={IDENTIFIER}
-
-
+NEWLINE= [\ \n]
+FOR = (for)
+COLON_EQUAL = (:=)
+IMPORT_DECL = ({IMPORT_SPEC}|(\({IMPORT_SPEC}*\)))
+IMPORT_SPEC = (\.|{IDENTIFIER})?ST
+IMPORT = import
+OPEN_PARAN = (\()
+CLOSE_PARAN = (\))
 
 %eofval{
 //Add code to be executed when the end of the file is reached
-	return (new Token(Token.EOF, yytext()));
+ return (new Token(Token.EOF, yytext()));
 %eofval}
 
 
 %% 
-<YYINITIAL> {IDENTIFIER} {
- //	if(yytext().equals("package")) {
- 	//	return (new Token(Token.PACKAGE,yytext()));
- 	//}
- //	else {
- 	return (new Token(Token.IDENTIFIER,yytext()));
-// 	}
- }
-<YYINITIAL> {NEWLINE} {}
+<YYINITIAL> {IMPORT} { yybegin(IMPORT); return (new Token(Token.IMPORT,yytext())); }
+<YYINITIAL> {PACKAGE_CLAUSE} { yybegin(PACKAGE); return (new Token(Token.PACKAGE,yytext())); }
+<YYINITIAL> {FOR} {return (new Token(Token.FOR,yytext()));}
+<YYINITIAL> {COLON_EQUAL} {return (new Token(Token.COLON_EQUAL,yytext()));}
+<YYINITIAL> {SPACE} {}
+<YYINITIAL> {TAB} {}
 <YYINITIAL> {INT_LIT} { return (new Token(Token.INT_LIT,yytext())); }
 <YYINITIAL> {STRING_LIT} { return (new Token(Token.STRING_LIT,yytext())); }
-<YYINITIAL> {PACKAGE_CLAUSE} { return (new Token(Token.PACKAGE,yytext())); }
-<YYINITIAL> . {
-  return new Token(Token.ERROR, "Invalid input: " + yytext());
-}
+<YYINITIAL> {NEWLINE} {}
+<YYINITIAL> {IDENTIFIER} {return (new Token(Token.IDENTIFIER,yytext()));}
+<YYINITIAL> . {return new Token(Token.ERROR, "Invalid input: " + yytext());}
+<PACKAGE> {SPACE} {}
+<PACKAGE> {NEWLINE} {}
+<PACKAGE> {TAB} {}
+<PACKAGE> {IDENTIFIER} { yybegin(YYINITIAL); return (new Token(Token.IDENTIFIER,yytext())); } 
+<PACKAGE> . {return new Token(Token.ERROR, "Invalid input: " + yytext());}
+
+<IMPORT> {SPACE} {}
+<IMPORT> {NEWLINE} {}
+<IMPORT> {TAB} {}
+<IMPORT>  {OPEN_PARAN} { import_open_paran = 1; return new Token(Token.OPEN_PARAN, yytext());}
+<IMPORT> {STRING_LIT} { if(import_open_paran == 0) yybegin(YYINITIAL); return (new Token(Token.STRING_LIT,yytext())); }
+<IMPORT>  {CLOSE_PARAN} { yybegin(YYINITIAL); import_open_paran = 0; return new Token(Token.CLOSE_PARAN, yytext());}
+<IMPORT> {IDENTIFIER} { yybegin(YYINITIAL); return (new Token(Token.IDENTIFIER,yytext())); } 
+<IMPORT> . {return new Token(Token.ERROR, "Invalid input: " + yytext());}
+
