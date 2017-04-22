@@ -58,10 +58,10 @@ UNICODE_LETTER=[A-Za-z]
 UNICODE_DIGIT=[0-9]
 UNICODE_CHAR=(.)
 LETTER=({UNICODE_LETTER}|_)
-UNICODE_VALUE=({UNICODE_CHAR}|{ESC_CHAR})
-ESC_CHAR=\\(a|b|f|n|r|t|v|\\|'|\")
+UNICODE_VALUE=({UNICODE_CHAR})
+ESC_CHAR=\\(a|b|f|n|r|t|v|(\\)|'|(\"))
 RAW_STRING = '({UNICODE_CHAR}|{NEWLINE})*'
-INTERP_STRING = \"{UNICODE_VALUE}*\"
+INTERP_STRING = \"({UNICODE_VALUE})*\"
 STRING_LIT={RAW_STRING}|{INTERP_STRING}
 NEWLINE = [\n]
 SPACE=[\ ]
@@ -98,7 +98,10 @@ IDENTIFIER=({LETTER}({LETTER}|{UNICODE_DIGIT})*)
 
 %eofval{
 //Add code to be executed when the end of the file is reached
- return (new Token(Token.EOF, eofMessage));
+if(checker.size() != 0)
+ return (new Token(Token.EOF, "There is some " + checker.peek() + " that is not closed"));
+else
+ return (new Token(Token.EOF, "DONE"));
 %eofval}
 
 
@@ -129,22 +132,27 @@ IDENTIFIER=({LETTER}({LETTER}|{UNICODE_DIGIT})*)
 	 	checker.pop();
 	 	return (new Token(Token.CLOSE_PARAN,yytext()));
 	 }
+	if(checker.peek() == '{') {
+		return (new Token(Token.ERROR, ") has no matching ( in line " + (yyline + 1)));
+	}
 }
 <YYINITIAL> {OPEN_CURLY} {checker.push('{'); return (new Token(Token.OPEN_CURLY,yytext()));}
 <YYINITIAL> {CLOSE_CURLY} {
-	if(checker.peek() == '}') {
+	if(checker.peek() == '{') {
 	 	checker.pop();
 	 	return (new Token(Token.CLOSE_CURLY,yytext()));
 	 }
+	else
+		return (new Token(Token.ERROR, "} has no matching { in line " + (yyline + 1)));
 }
 <YYINITIAL> {COMMENT} {}
 <YYINITIAL> {SPACE} {}
 <YYINITIAL> {TAB} {}
 <YYINITIAL> {INT_LIT} { return (new Token(Token.INT_LIT,yytext())); }
-<YYINITIAL> {STRING_LIT} { return (new Token(Token.STRING_LIT,yytext())); }
+<YYINITIAL> {INTERP_STRING} { return (new Token(Token.STRING_LIT,yytext())); }
 <YYINITIAL> {NEWLINE} {}
 <YYINITIAL> {IDENTIFIER} {return (new Token(Token.IDENTIFIER,yytext()));}
-<YYINITIAL> . {return new Token(Token.ERROR, "Invalid input: " + yytext());}
+<YYINITIAL> . {return new Token(Token.ERROR, "Invalid input: " + yytext() + " in " + (yyline + 1));}
 
 
 <PACKAGE> {SPACE} {}
