@@ -95,7 +95,8 @@ COLON=:
 DEFAULT=default
 COMMENT=//(.)*
 IDENTIFIER=({LETTER}({LETTER}|{UNICODE_DIGIT})*)
-
+INCREMENT=\+\+
+DECREMENT=--
 COMMA =,
 SEMI_COLON =;
 PLUS =\+
@@ -134,6 +135,8 @@ else
 <YYINITIAL> {FUNC} {return (new Token(Token.FUNC,yytext()));}
 <YYINITIAL> {RETURN} {return (new Token(Token.RETURN,yytext()));}
 <YYINITIAL> {EQUAL} {return (new Token(Token.EQUAL,yytext()));}
+<YYINITIAL> {INCREMENT} {return (new Token(Token.INCREMENT,yytext()));}
+<YYINITIAL> {DECREMENT} {return (new Token(Token.DECREMENT,yytext()));}
 <YYINITIAL> {OPEN_PARAN} {checker.push('('); return (new Token(Token.OPEN_PARAN,yytext()));}
 <YYINITIAL> {CLOSE_PARAN} {
 	if(checker.peek() == '(') {
