@@ -38,12 +38,13 @@ class Lexer {
 %type Token
 %char
 %line
-%state PACKAGE, IMPORT
+%state PACKAGE, IMPORT, COMMENT
 %{
  //initialize  variables to be used by class
  String eofMessage = "DONE";
  int import_open_paran;
  Stack<Character> checker;
+ int comment_count = 0;
 %}
 
 
@@ -80,10 +81,19 @@ OPEN_PARAN = (\()
 CLOSE_PARAN = (\))
 OPEN_CURLY=\{
 CLOSE_CURLY=\}
+ELSE=else
 DOT=\.
 SLASH=/
 REL_OP===|!=|<|>|<=|>=
 AND_OP=&
+MUL_OP=\*
+MINUS_OP=-
+RETURN=return
+SWITCH=switch
+CASE=case
+COLON=:
+DEFAULT=default
+COMMENT=//(.)*
 IDENTIFIER=({LETTER}({LETTER}|{UNICODE_DIGIT})*)
 
 %eofval{
@@ -97,13 +107,21 @@ IDENTIFIER=({LETTER}({LETTER}|{UNICODE_DIGIT})*)
 <YYINITIAL> {PACKAGE} { return (new Token(Token.PACKAGE,yytext())); }
 <YYINITIAL> {FOR} {return (new Token(Token.FOR,yytext()));}
 <YYINITIAL> {COLON_EQUAL} {return (new Token(Token.COLON_EQUAL,yytext()));}
+<YYINITIAL> {COLON} {return (new Token(Token.COLON,yytext()));}
 <YYINITIAL> {DOT} {return (new Token(Token.DOT,yytext()));}
 <YYINITIAL> {IF} {return (new Token(Token.IF,yytext()));}
+<YYINITIAL> {ELSE} {return (new Token(Token.ELSE,yytext()));}
 <YYINITIAL> {AND_OP} {return (new Token(Token.AMBERSAND,yytext()));}
 <YYINITIAL> {PERCENT} {return (new Token(Token.PERCENT,yytext()));}
 <YYINITIAL> {REL_OP} {return (new Token(Token.REL_OP,yytext()));}
+<YYINITIAL> {MUL_OP} {return (new Token(Token.ASTRISK,yytext()));}
+<YYINITIAL> {SWITCH} {return (new Token(Token.SWITCH,yytext()));}
+<YYINITIAL> {CASE} {return (new Token(Token.CASE,yytext()));}
+<YYINITIAL> {DEFAULT} {return (new Token(Token.DEFAULT,yytext()));}
+<YYINITIAL> {MINUS_OP} {return (new Token(Token.MINUS,yytext()));}
 <YYINITIAL> {SLASH} {return (new Token(Token.SLASH,yytext()));}
 <YYINITIAL> {FUNC} {return (new Token(Token.FUNC,yytext()));}
+<YYINITIAL> {RETURN} {return (new Token(Token.RETURN,yytext()));}
 <YYINITIAL> {EQUAL} {return (new Token(Token.EQUAL,yytext()));}
 <YYINITIAL> {OPEN_PARAN} {checker.push('('); return (new Token(Token.OPEN_PARAN,yytext()));}
 <YYINITIAL> {CLOSE_PARAN} {
@@ -119,6 +137,7 @@ IDENTIFIER=({LETTER}({LETTER}|{UNICODE_DIGIT})*)
 	 	return (new Token(Token.CLOSE_CURLY,yytext()));
 	 }
 }
+<YYINITIAL> {COMMENT} {}
 <YYINITIAL> {SPACE} {}
 <YYINITIAL> {TAB} {}
 <YYINITIAL> {INT_LIT} { return (new Token(Token.INT_LIT,yytext())); }
