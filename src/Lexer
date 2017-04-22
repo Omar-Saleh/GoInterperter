@@ -68,7 +68,9 @@ TAB=[\t]
 INT_LIT = ([1-9]{UNICODE_DIGIT}*)|0
 PACKAGE=package
 NEWLINE= [\ \n]
-FOR = (for)
+FOR =for
+IF=if
+PERCENT=%
 COLON_EQUAL = (:=)
 IMPORT = import
 CONST=const
@@ -80,6 +82,8 @@ OPEN_CURLY=\{
 CLOSE_CURLY=\}
 DOT=\.
 SLASH=/
+REL_OP===|!=|<|>|<=|>=
+AND_OP=&
 IDENTIFIER=({LETTER}({LETTER}|{UNICODE_DIGIT})*)
 
 %eofval{
@@ -94,6 +98,10 @@ IDENTIFIER=({LETTER}({LETTER}|{UNICODE_DIGIT})*)
 <YYINITIAL> {FOR} {return (new Token(Token.FOR,yytext()));}
 <YYINITIAL> {COLON_EQUAL} {return (new Token(Token.COLON_EQUAL,yytext()));}
 <YYINITIAL> {DOT} {return (new Token(Token.DOT,yytext()));}
+<YYINITIAL> {IF} {return (new Token(Token.IF,yytext()));}
+<YYINITIAL> {AND_OP} {return (new Token(Token.AMBERSAND,yytext()));}
+<YYINITIAL> {PERCENT} {return (new Token(Token.PERCENT,yytext()));}
+<YYINITIAL> {REL_OP} {return (new Token(Token.REL_OP,yytext()));}
 <YYINITIAL> {SLASH} {return (new Token(Token.SLASH,yytext()));}
 <YYINITIAL> {FUNC} {return (new Token(Token.FUNC,yytext()));}
 <YYINITIAL> {EQUAL} {return (new Token(Token.EQUAL,yytext()));}
