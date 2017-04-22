@@ -60,7 +60,7 @@ UNICODE_CHAR=(.)
 LETTER=({UNICODE_LETTER}|_)
 UNICODE_VALUE=({UNICODE_CHAR}|{ESC_CHAR})
 ESC_CHAR=\\(a|b|f|n|r|t|v|\\|'|\")
-RAW_STRING = '({UNICODE_CHAR}|{NEWLINE})*'
+RAW_STRING = `({UNICODE_CHAR}|{NEWLINE})*`
 INTERP_STRING = \"{UNICODE_VALUE}*\"
 STRING_LIT={RAW_STRING}|{INTERP_STRING}
 NEWLINE = [\n]
@@ -85,7 +85,7 @@ ELSE=else
 DOT=\.
 SLASH=/
 REL_OP===|!=|<|>|<=|>=
-AND_OP=&
+AND_OP=&&
 MUL_OP=\*
 MINUS_OP=-
 RETURN=return
@@ -96,6 +96,14 @@ DEFAULT=default
 COMMENT=//(.)*
 IDENTIFIER=({LETTER}({LETTER}|{UNICODE_DIGIT})*)
 
+COMMA =,
+SEMI_COLON =;
+PLUS =\+
+OPEN_SQUARE=\[
+CLOSE_SQUARE=\]
+TYPE =type
+STRUCT =struct
+VAR =var
 %eofval{
 //Add code to be executed when the end of the file is reached
  return (new Token(Token.EOF, eofMessage));
@@ -111,7 +119,7 @@ IDENTIFIER=({LETTER}({LETTER}|{UNICODE_DIGIT})*)
 <YYINITIAL> {DOT} {return (new Token(Token.DOT,yytext()));}
 <YYINITIAL> {IF} {return (new Token(Token.IF,yytext()));}
 <YYINITIAL> {ELSE} {return (new Token(Token.ELSE,yytext()));}
-<YYINITIAL> {AND_OP} {return (new Token(Token.AMBERSAND,yytext()));}
+<YYINITIAL> {AND_OP} {return (new Token(Token.AND_OP,yytext()));}
 <YYINITIAL> {PERCENT} {return (new Token(Token.PERCENT,yytext()));}
 <YYINITIAL> {REL_OP} {return (new Token(Token.REL_OP,yytext()));}
 <YYINITIAL> {MUL_OP} {return (new Token(Token.ASTRISK,yytext()));}
@@ -125,18 +133,30 @@ IDENTIFIER=({LETTER}({LETTER}|{UNICODE_DIGIT})*)
 <YYINITIAL> {EQUAL} {return (new Token(Token.EQUAL,yytext()));}
 <YYINITIAL> {OPEN_PARAN} {checker.push('('); return (new Token(Token.OPEN_PARAN,yytext()));}
 <YYINITIAL> {CLOSE_PARAN} {
-	if(checker.peek() == '(') {
-	 	checker.pop();
-	 	return (new Token(Token.CLOSE_PARAN,yytext()));
-	 }
+  if(checker.peek() == '(') {
+    checker.pop();
+    return (new Token(Token.CLOSE_PARAN,yytext()));
+   }
 }
 <YYINITIAL> {OPEN_CURLY} {checker.push('{'); return (new Token(Token.OPEN_CURLY,yytext()));}
 <YYINITIAL> {CLOSE_CURLY} {
-	if(checker.peek() == '}') {
-	 	checker.pop();
-	 	return (new Token(Token.CLOSE_CURLY,yytext()));
-	 }
+  if(checker.peek() == '}') {
+    checker.pop();
+    return (new Token(Token.CLOSE_CURLY,yytext()));
+   }
 }
+
+
+<YYINITIAL> {COMMA} {return (new Token(Token.COMMA,yytext()));}
+<YYINITIAL> {SEMI_COLON} {return (new Token(Token.SEMI_COLON,yytext()));}
+<YYINITIAL> {PLUS} {return (new Token(Token.PLUS,yytext()));}
+<YYINITIAL> {OPEN_SQUARE} {return (new Token(Token.OPEN_SQUARE,yytext()));}
+<YYINITIAL> {CLOSE_SQUARE} {return (new Token(Token.CLOSE_SQUARE,yytext()));}
+<YYINITIAL> {TYPE} {return (new Token(Token.TYPE,yytext()));}
+<YYINITIAL> {STRUCT} {return (new Token(Token.STRUCT,yytext()));}
+<YYINITIAL> {CONST} {return (new Token(Token.CONST,yytext()));}
+<YYINITIAL> {VAR} {return (new Token(Token.VAR,yytext()));}
+
 <YYINITIAL> {COMMENT} {}
 <YYINITIAL> {SPACE} {}
 <YYINITIAL> {TAB} {}
@@ -161,4 +181,3 @@ IDENTIFIER=({LETTER}({LETTER}|{UNICODE_DIGIT})*)
 <IMPORT>  {CLOSE_PARAN} { yybegin(YYINITIAL); import_open_paran = 0; return new Token(Token.CLOSE_PARAN, yytext());}
 <IMPORT> {IDENTIFIER} { yybegin(YYINITIAL); return (new Token(Token.IDENTIFIER,yytext())); } 
 <IMPORT> . {return new Token(Token.ERROR, "Invalid input: " + yytext());}
-
