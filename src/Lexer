@@ -56,7 +56,7 @@ checker = new Stack<Character>();
 
 UNICODE_LETTER=[A-Za-z]
 UNICODE_DIGIT=[0-9]
-UNICODE_CHAR=[^\"]
+UNICODE_CHAR=[^\"\n]
 LETTER=({UNICODE_LETTER}|_)
 UNICODE_VALUE=({UNICODE_CHAR}|{ESC_CHAR})
 ESC_CHAR=\\(a|b|f|n|r|t|v|\\|'|\")
@@ -175,7 +175,7 @@ else
 <YYINITIAL> {INTERP_STRING} { return (new Token(Token.STRING_LIT,yytext())); }
 <YYINITIAL> {NEWLINE} {}
 <YYINITIAL> {IDENTIFIER} {return (new Token(Token.IDENTIFIER,yytext()));}
-<YYINITIAL> . {return new Token(Token.ERROR, "Invalid input: " + yytext() + " in " + (yyline + 1));}
+<YYINITIAL> . {return new Token(Token.ERROR, "Invalid input: " + yytext() + " in line " + (yyline + 1));}
 
 
 <PACKAGE> {SPACE} {}
