@@ -18,7 +18,7 @@ import java.io.IOException;
  */
 public class MLA {
 	public static void main(String[] args) {
-		String inFile = "Go.in";
+		String inFile = "TestCases/Go.in";
 		String outFile = "Current.out";
 
 		if (args.length > 1) {
