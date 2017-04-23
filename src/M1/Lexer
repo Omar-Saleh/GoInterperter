@@ -105,6 +105,16 @@ CLOSE_SQUARE=\]
 TYPE =type
 STRUCT =struct
 VAR =var
+
+OR_OP=\|\|
+CDOTS =\.\.\.
+SHIFT_LEFT =<<
+SHIFT_RIGHT=>>
+BAR =\|
+EXCLAMATION=!
+LESS_DASH =<-
+AMBERSAND=&
+
 %eofval{
 //Add code to be executed when the end of the file is reached
 if(checker.size() != 0)
@@ -115,6 +125,14 @@ else
 
 
 %% 
+<YYINITIAL> {OR_OP} {return (new Token(Token.OR_OP,yytext())); }
+<YYINITIAL> {CDOTS} {return (new Token(Token.CDOTS,yytext())); }
+<YYINITIAL> {SHIFT_LEFT} {return (new Token(Token.SHIFT_LEFT,yytext())); }
+<YYINITIAL> {BAR} {return (new Token(Token.BAR,yytext())); }
+<YYINITIAL> {EXCLAMATION} {return (new Token(Token.EXCLAMATION,yytext())); }
+<YYINITIAL> {LESS_DASH} {return (new Token(Token.LESS_DASH,yytext())); }
+<YYINITIAL> {AMBERSAND} {return (new Token(Token.AMBERSAND,yytext())); }
+
 <YYINITIAL> {IMPORT} {return (new Token(Token.IMPORT,yytext())); }
 <YYINITIAL> {PACKAGE} { return (new Token(Token.PACKAGE,yytext())); }
 <YYINITIAL> {FOR} {return (new Token(Token.FOR,yytext()));}
