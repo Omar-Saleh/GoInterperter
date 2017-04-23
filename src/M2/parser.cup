@@ -1,0 +1,102 @@
+
+import java_cup.runtime.*;
+	
+/* Terminals (tokens returned by the scanner). */
+terminal			DOC_CLASS, PACKAGE, BEGIN_DOC, END_DOC, 
+					TITLE,NEWLINE, DATE, SECTION,
+					BF, MAKE;
+terminal	String	TEXT, BODY;		
+
+/* Non-terminals */
+nonterminal	String	document, package_list, all_doc_content,
+					doc_content, title, date, make_title;
+
+
+
+/* The grammar */
+document ::= 	DOC_CLASS package_list BEGIN_DOC title:t all_doc_content:d END_DOC
+				{: 
+				    System.out.println("document");
+					RESULT = t + d;	 
+				:}
+				| DOC_CLASS BEGIN_DOC title:t all_doc_content:d END_DOC
+				{: 
+					RESULT = t + d;	 
+				:}
+				| DOC_CLASS BEGIN_DOC END_DOC
+				{: 
+					RESULT = "";	 
+				:}
+				| DOC_CLASS package_list BEGIN_DOC END_DOC
+				{: 
+					RESULT = "";	 
+				:};  
+
+package_list ::=  PACKAGE
+				{:
+                    System.out.println("package"); 				
+					RESULT = "";
+				:};
+
+title ::= 		TITLE TEXT:t date:s
+				{: 
+				System.out.println("title"); 	
+					RESULT = t.substring(1,t.length()-1) + s;
+				:};
+				
+
+date ::= 		DATE TEXT:t make_title:m
+				{: 
+				 System.out.println("date"); 	
+					RESULT = "\n" + t.substring(1,t.length()-1) + m;
+				:};
+				
+
+make_title ::= 	MAKE
+				{:
+				   System.out.println("make"); 	
+					RESULT = "";
+				:};
+				
+all_doc_content ::= doc_content:d
+				{:
+				System.out.println("document content"); 	
+					RESULT = d;
+				:}
+				| doc_content:d all_doc_content:a
+				{:
+					System.out.println("documnet content"); 	
+					RESULT = d + a;
+				:};
+
+
+doc_content ::= TEXT:t
+				{: 
+				System.out.println("text"); 	
+					RESULT = t.substring(1,t.length()-1);
+				:}
+				| BODY:b
+				{: 
+				System.out.println("body"); 	
+					RESULT = b;
+				:}
+				| BF TEXT:t
+				{: 
+				System.out.println("bf"); 	
+					RESULT = t.substring(1,t.length()-1);
+				:}
+				| NEWLINE
+				{: 
+				System.out.println("newline"); 	
+					RESULT = "\n";
+				:}
+				| SECTION TEXT:t
+				{: 
+				System.out.println("section "+t); 	
+					RESULT = "\n" + t.substring(1,t.length()-1) + "\n";
+				:}
+				| error:e
+				{:
+				System.out.println("error"); 	
+					RESULT = "\nParse Error\n";
+				:};

@@ -1,3 +1,5 @@
+package M1;
+
 public class Token {
 
 	int token;

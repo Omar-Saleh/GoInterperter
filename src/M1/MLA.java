@@ -1,3 +1,5 @@
+package M1;
+
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -18,7 +20,7 @@ import java.io.IOException;
  */
 public class MLA {
 	public static void main(String[] args) {
-		String inFile = "TestCases/Go.in";
+		String inFile = "TestCases/Go6.in";
 		String outFile = "Current.out";
 
 		if (args.length > 1) {
